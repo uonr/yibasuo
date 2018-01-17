@@ -2,6 +2,8 @@
 import argparse
 import os
 
+from shlex import quote
+
 
 EXT = '.mp4'
 
@@ -44,6 +46,7 @@ def main():
         fmt['output'] = new_name
 
         fmt['output'] += EXT
+    fmt['output'] = quote(fmt['output'])
 
     fmt['time'] = ''
 
@@ -63,10 +66,10 @@ def main():
     elif args.resize:
         vf.append('scale=-1:720')
 
-    fmt['vf'] = '-vf "{}"'.format(','.join(vf))
+    fmt['vf'] = '-vf {}'.format(quote(','.join(vf)))
 
-    run('ffmpeg -i "{}" -c:v libx264 -crf {crf} {vf} -pix_fmt yuv420p -preset veryslow -an "{output}"'
-        .format(args.video, **fmt))
+    run('ffmpeg -i -c:v libx264 -crf {crf} {vf} -pix_fmt yuv420p -preset veryslow -an {output}'
+        .format(quote(args.video), **fmt))
 
 
 if __name__ == '__main__':
