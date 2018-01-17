@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='yibasuo',
-    version='0.1',
+    version='0.2',
     description='A script to generate GIF-like video for Telegram/Twitter/etc.',
     url='https://github.com/quanbrew/yibasuo',
     author='Quan Brew',

@@ -3,10 +3,19 @@ import argparse
 import os
 
 
+EXT = '.mp4'
+
+
+def run(command):
+    # print(command)
+    os.system(command)
+
+
 def main():
     parser = argparse.ArgumentParser(description='Generate GIF-like MP4 video for Telegram/Twitter/etc.')
     parser.add_argument('video', type=str, help='The input video path.')
     parser.add_argument('--span', nargs=2, type=str, metavar=('START', 'END'), help='Specify cut time.')
+    parser.add_argument('--frame', nargs=2, type=int, metavar=('START', 'END'), help='Specify cut frame.')
     parser.add_argument('--crop', nargs=4, type=str, metavar=('WIDTH', 'HEIGHT', 'X', 'Y'), help='Crop input video.')
     parser.add_argument('--crf', type=int, default=23, help='Specify the Constant Rate Factor of output video.')
     parser.add_argument('--resize', action='store_true', help='Auto resize input video to 720P.')
@@ -17,37 +26,47 @@ def main():
     if not os.path.isfile(args.video):
         raise RuntimeError('Wrong input video path.')
 
-    output = ''
+    fmt = {
+        'crf': args.crf,
+    }
+    vf = []
+
     if args.output:
-        output = args.output
+        fmt['output'] = args.output
     else:
         # Auto name output file.
-        p, _ = os.path.splitext(args.video)
-        output = '[GIF]{}'.format(os.path.basename(p))
-        if os.path.exists(output+'.mp4'):
-            no = 2
-            new_name = '{} - {}'.format(output, no)
-            while os.path.exists(new_name + '.mp4'):
-                no += 1
-            output = new_name
+        fmt['output'] = '[GIF]{}'.format(os.path.basename(os.path.splitext(args.video)[0]))
+        prefix = 1
+        new_name = fmt['output']
+        while os.path.exists(new_name+EXT):
+            prefix += 1
+            new_name = '{} - {}'.format(fmt['output'], prefix)
+        fmt['output'] = new_name
 
-        output += '.mp4'
+        fmt['output'] += EXT
 
-    time = ''
-    if args.span:
-        time = '-ss {} -to {}'.format(*args.span)
+    fmt['time'] = ''
 
-    crop = ''
+    if args.span and args.frame:
+        raise RuntimeError("--span and --frame can't specified at the same time.")
+    else:
+        if args.span:
+            fmt['time'] = '-ss {} -to {}'.format(*args.span)
+        if args.frame:
+            vf.append('select=between(n\,{}\,{}),setpts=PTS-STARTPTS'.format(*args.frame))
+
     if args.crop:
-        crop = '-filter:v "crop={}:{}:{}:{}"'.format(*args.crop)
+        vf.append('crop={}:{}:{}:{}'.format(*args.crop))
 
-    scale = ''
     if args.scale:
-        scale = '-vf scale={}:{}'.format(*args.size)
+        vf.append('scale={}:{}'.format(*args.size))
     elif args.resize:
-        scale = '-vf scale=-1:720'
+        vf.append('scale=-1:720')
 
-    os.system('ffmpeg -i "{}" -c:v libx264 -crf {crf} {scale} -pix_fmt yuv420p -preset veryslow -an {time} {crop} "{output}"'.format(args.video, time=time, crop=crop, crf=args.crf, scale=scale, output=output))
+    fmt['vf'] = '-vf "{}"'.format(','.join(vf))
+
+    run('ffmpeg -i "{}" -c:v libx264 -crf {crf} {vf} -pix_fmt yuv420p -preset veryslow -an "{output}"'
+        .format(args.video, **fmt))
 
 
 if __name__ == '__main__':
