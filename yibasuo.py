@@ -9,7 +9,7 @@ EXT = '.mp4'
 
 
 def run(command):
-    # print(command)
+    print(command)
     os.system(command)
 
 
@@ -21,7 +21,10 @@ def main():
     parser.add_argument('--crop', nargs=4, type=str, metavar=('WIDTH', 'HEIGHT', 'X', 'Y'), help='Crop input video.')
     parser.add_argument('--crf', type=int, default=23, help='Specify the Constant Rate Factor of output video.')
     parser.add_argument('--resize', action='store_true', help='Auto resize input video to 720P.')
+    parser.add_argument('--audio', action='store_true', help="Don't remove input video audio track.")
     parser.add_argument('--scale', type=str, nargs=2, metavar=('W', 'H'), help='ffmepg -vf scale=W:H')
+    parser.add_argument('--filter', type=str, nargs='+', help='ffmepg -vf ...')
+    parser.add_argument('--other', type=str, default='', help='Other ffmepg arguments.')
     parser.add_argument('-o', '--output', metavar='output', type=str)
     args = parser.parse_args()
 
@@ -30,6 +33,7 @@ def main():
 
     fmt = {
         'crf': args.crf,
+        'other': args.other,
     }
     vf = []
 
@@ -61,14 +65,22 @@ def main():
     if args.crop:
         vf.append('crop={}:{}:{}:{}'.format(*args.crop))
 
+    fmt['an'] = '-an'
+    if args.audio:
+        fmt['an'] = ''
+
     if args.scale:
         vf.append('scale={}:{}'.format(*args.size))
     elif args.resize:
         vf.append('scale=-1:720')
+    if args.filter:
+        vf.extend(args.filter)
+    if len(vf) != 0:
+        fmt['vf'] = '-vf {}'.format(quote(','.join(vf)))
+    else:
+        fmt['vf'] = ''
 
-    fmt['vf'] = '-vf {}'.format(quote(','.join(vf)))
-
-    run('ffmpeg -i -c:v libx264 -crf {crf} {vf} -pix_fmt yuv420p -preset veryslow -an {output}'
+    run('ffmpeg -i {} -c:v libx264 -crf {crf} {vf} {time} -pix_fmt yuv420p -preset veryslow {other} {an} {output}'
         .format(quote(args.video), **fmt))
 
 

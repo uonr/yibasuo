@@ -10,9 +10,10 @@ Generate GIF-like video for Telegram/Twitter/etc.
 ## Usage
 
 ~~~
-$ yibasuo.py --help
-usage: yibasuo.py [-h] [--span START END] [--crop WIDTH HEIGHT X Y]
-                  [--crf CRF] [--resize] [--scale W H] [-o output]
+usage: yibasuo.py [-h] [--span START END] [--frame START END]
+                  [--crop WIDTH HEIGHT X Y] [--crf CRF] [--resize] [--audio]
+                  [--scale W H] [--filter FILTER [FILTER ...]] [--other OTHER]
+                  [-o output]
                   video
 
 Generate GIF-like MP4 video for Telegram/Twitter/etc.
@@ -23,11 +24,16 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --span START END      Specify cut time.
+  --frame START END     Specify cut frame.
   --crop WIDTH HEIGHT X Y
                         Crop input video.
   --crf CRF             Specify the Constant Rate Factor of output video.
   --resize              Auto resize input video to 720P.
+  --audio               Don't remove input video audio track.
   --scale W H           ffmepg -vf scale=W:H
+  --filter FILTER [FILTER ...]
+                        ffmepg -vf ...
+  --other OTHER         Other ffmepg arguments.
   -o output, --output output
 ~~~
 
