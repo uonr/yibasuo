@@ -9,7 +9,7 @@ EXT = '.mp4'
 
 
 def run(command):
-    print(command)
+    print("RUN COMMAND:\n    " + command)
     os.system(command)
 
 
@@ -22,6 +22,9 @@ def main():
     parser.add_argument('--crf', type=int, default=23, help='Specify the Constant Rate Factor of output video.')
     parser.add_argument('--resize', action='store_true', help='Auto resize input video to 720P.')
     parser.add_argument('--audio', action='store_true', help="Don't remove input video audio track.")
+    parser.add_argument('--gif', action='store_true', help="Generate addition .gif output file.")
+    parser.add_argument('--gif_fps', type=int, default=15, help='FPS of the .gif file, default is 15.')
+    parser.add_argument('--ass', type=str, help="Burn .ass subtitle into the video.")
     parser.add_argument('--scale', type=str, nargs=2, metavar=('W', 'H'), help='ffmepg -vf scale=W:H')
     parser.add_argument('--filter', type=str, nargs='+', help='ffmepg -vf ...')
     parser.add_argument('--other', type=str, default='', help='Other ffmepg arguments.')
@@ -50,6 +53,7 @@ def main():
         fmt['output'] = new_name
 
         fmt['output'] += EXT
+    filename = fmt['output']
     fmt['output'] = quote(fmt['output'])
 
     fmt['time'] = ''
@@ -69,10 +73,17 @@ def main():
     if args.audio:
         fmt['an'] = ''
 
+    resize = ''
     if args.scale:
-        vf.append('scale={}:{}'.format(*args.size))
+        resize = 'scale={}:{}'.format(*args.scale)
     elif args.resize:
-        vf.append('scale=-1:720')
+        resize = 'scale=-1:720'
+    if resize != '':
+        vf.append(resize)
+
+    if args.ass:
+        vf.append('ass={}'.format(args.ass))
+
     if args.filter:
         vf.extend(args.filter)
     if len(vf) != 0:
@@ -82,6 +93,17 @@ def main():
 
     run('ffmpeg -i {} -c:v libx264 -crf {crf} {vf} {time} -pix_fmt yuv420p -preset veryslow {other} {an} {output}'
         .format(quote(args.video), **fmt))
+
+    if args.gif:
+        if resize == '':
+            resize = 'scale=iw:ih'
+        run('ffmpeg -i {} -vf "fps={fps},{resize}:-1:flags=lanczos,palettegen" palette.png'
+            .format(fmt['output'], resize=resize, fps=args.gif_fps))
+        run('ffmpeg -i {input} -i palette.png -filter_complex'
+            ' "fps={fps},{resize}:flags=lanczos[x];[x][1:v]paletteuse" {output}'
+            .format(input=fmt['output'], output=quote(filename+'.gif'),
+                    resize=resize, fps=args.gif_fps))
+        run('rm palette.png')
 
 
 if __name__ == '__main__':

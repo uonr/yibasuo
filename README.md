@@ -12,8 +12,8 @@ Generate GIF-like video for Telegram/Twitter/etc.
 ~~~
 usage: yibasuo.py [-h] [--span START END] [--frame START END]
                   [--crop WIDTH HEIGHT X Y] [--crf CRF] [--resize] [--audio]
-                  [--scale W H] [--filter FILTER [FILTER ...]] [--other OTHER]
-                  [-o output]
+                  [--gif] [--gif_fps GIF_FPS] [--ass ASS] [--scale W H]
+                  [--filter FILTER [FILTER ...]] [--other OTHER] [-o output]
                   video
 
 Generate GIF-like MP4 video for Telegram/Twitter/etc.
@@ -30,6 +30,9 @@ optional arguments:
   --crf CRF             Specify the Constant Rate Factor of output video.
   --resize              Auto resize input video to 720P.
   --audio               Don't remove input video audio track.
+  --gif                 Generate addition .gif output file.
+  --gif_fps GIF_FPS     FPS of the .gif file, default is 15.
+  --ass ASS             Burn .ass subtitle into the video.
   --scale W H           ffmepg -vf scale=W:H
   --filter FILTER [FILTER ...]
                         ffmepg -vf ...
@@ -40,7 +43,7 @@ optional arguments:
 ## Install
 
 
-### Install via pip3
+### Install via pip
 
 ~~~
 pip3 install yibasuo
