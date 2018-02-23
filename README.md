@@ -1,4 +1,4 @@
-# yibasuo
+# 一把梭
 
 Generate GIF-like video for Telegram/Twitter/etc.
 
@@ -9,10 +9,10 @@ Generate GIF-like video for Telegram/Twitter/etc.
 
 ## Usage
 
-~~~
+```
 usage: yibasuo.py [-h] [--span START END] [--frame START END]
-                  [--crop WIDTH HEIGHT X Y] [--crf CRF] [--resize] [--audio]
-                  [--gif] [--gif_fps GIF_FPS] [--ass ASS] [--scale W H]
+                  [--crop WIDTH HEIGHT X Y] [--crf CRF] [--720p] [--audio]
+                  [--with-gif] [--gif] [--reverse] [--ass ASS] [--scale W H]
                   [--filter FILTER [FILTER ...]] [--other OTHER] [-o output]
                   video
 
@@ -28,38 +28,39 @@ optional arguments:
   --crop WIDTH HEIGHT X Y
                         Crop input video.
   --crf CRF             Specify the Constant Rate Factor of output video.
-  --resize              Auto resize input video to 720P.
+  --720p                Auto resize input video to 720P.
   --audio               Don't remove input video audio track.
-  --gif                 Generate addition .gif output file.
-  --gif_fps GIF_FPS     FPS of the .gif file, default is 15.
+  --with-gif            Generate addition .gif output file.
+  --gif                 Convert input video to .gif file.
+  --reverse             ONLY reverse input video, other arguments invalid
+                        (except --gif).
   --ass ASS             Burn .ass subtitle into the video.
   --scale W H           ffmepg -vf scale=W:H
   --filter FILTER [FILTER ...]
                         ffmepg -vf ...
   --other OTHER         Other ffmepg arguments.
   -o output, --output output
-~~~
+```
 
 ## Install
 
 
-### Install via pip
+### Install via PyPI
 
-~~~
+```
 pip3 install yibasuo
-~~~
+```
 
 
-### Install via git
-~~~
+### Install via source
+```
 git clone https://github.com/quanbrew/yibasuo
-cd yibasuo
-python3 setup.py install --user
-~~~
+pip3 install -e ./yibasuo
+```
 
 ### Download via cURL
 
-~~~
+```
 curl https://raw.githubusercontent.com/quanbrew/yibasuo/master/yibasuo.py > yibasuo.py
 chmod u+x yibasuo.py
-~~~
+```
