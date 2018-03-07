@@ -34,7 +34,7 @@ def make_clip(args):
             suffix += 1
         output = name
 
-
+    fmt['time'] = ""
     if args.span and args.frame:
         raise RuntimeError("--span and --frame can't specified at the same time.")
     else:
