@@ -44,23 +44,13 @@ optional arguments:
 
 ## Install
 
-
-### Install via PyPI
-
-```
-pip3 install yibasuo
-```
-
-
-### Install via source
 ```
 git clone https://github.com/quanbrew/yibasuo
 pip3 install -e ./yibasuo
 ```
 
-### Download via cURL
+or nix:
 
 ```
-curl https://raw.githubusercontent.com/quanbrew/yibasuo/master/yibasuo.py > yibasuo.py
-chmod u+x yibasuo.py
+nix -if .
 ```
